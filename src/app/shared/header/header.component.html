@@ -1,0 +1,35 @@
+<header>
+  <div class="navbar navbar-dark">
+    <div class="container-fluid">
+      <a [routerLink]="['/']" class="navbar-brand">Prophector | COVID-19</a>
+
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/']"
+            [routerLinkActive]="'active'"
+            [routerLinkActiveOptions]="{ exact: true }"
+            >World Map</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/chart-analysis']" [routerLinkActive]="'active'">Analyze</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/about']" [routerLinkActive]="'active'">About</a>
+        </li>
+      </ul>
+
+      <div *ngIf="userDisplayName">
+        <button class="btn btn-sm user-button" type="button" [routerLink]="['/profile']">
+          {{ userDisplayName }}
+        </button>
+        <button class="btn btn-sm logout-button" type="button" (click)="signOut()">Sign out</button>
+      </div>
+      <div *ngIf="!userDisplayName">
+        <button class="btn btn-sm login-button" type="button" [routerLink]="['/login']">Sign In</button>
+      </div>
+    </div>
+  </div>
+</header>

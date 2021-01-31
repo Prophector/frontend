@@ -1,0 +1,31 @@
+@import '~mapbox-gl/dist/mapbox-gl.css';
+
+@import './app/styles/variables';
+@import './app/styles/bootstrap';
+@import './app/styles/misc';
+@import './app/styles/tooltip';
+
+html,
+body {
+  min-height: 100%;
+}
+
+// width
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+// Track
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+// Handle
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+// Handle on hover
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

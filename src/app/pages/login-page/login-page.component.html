@@ -1,0 +1,40 @@
+<div class="col-md-12">
+  <div class="card card-container">
+    <ng-container *ngIf="!isLoggedIn">
+      <p *ngIf="reason" class="alert alert-info">{{ reason }}</p>
+
+      <img src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" class="profile-img-card" alt="Avatar" />
+      <div class="form-group mb-5">
+        <div class="alert alert-danger" role="alert" *ngIf="isLoginFailed">
+          Login failed: {{ errorMessage }}
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row text-center mb-4">
+          <a href="{{ googleURL }}" class="btn btn-outline-dark">
+            <fa-icon [icon]="faGoogle" class="me-2"></fa-icon>
+            Sign in with Google
+          </a>
+        </div>
+        <div class="row text-center">
+          <a href="{{ githubURL }}" class="btn btn-outline-dark">
+            <fa-icon [icon]="faGithub" class="me-2"></fa-icon>
+            Sign in with GitHub
+          </a>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="isLoggedIn && currentUser">
+      <img
+        [src]="
+          currentUser.hash
+            ? 'https://s.gravatar.com/avatar/' + currentUser.hash + '?s=80'
+            : '//ssl.gstatic.com/accounts/ui/avatar_2x.png'
+        "
+        class="profile-img-card"
+        alt="Avatar"
+      />
+      <div class="alert alert-success text-center">Welcome {{ currentUser.displayName }}.</div>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-lg-3 mb-4">
+    <app-chart-options [options]="options"></app-chart-options>
+  </div>
+  <div class="col-lg-7">
+    <div class="row">
+      <div class="col">
+        <app-data-options [options]="dataOptions"></app-data-options>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <app-line-chart [data]="data" [options]="displayOptions" [yLabel]="yLabel"></app-line-chart>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <app-display-options [displayOptions]="displayOptions"></app-display-options>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-2">
+    <app-prediction-options [chartOptions]="options"> </app-prediction-options>
+  </div>
+</div>
+<div class="row mt-5">
+  <div class="col">
+    <app-prediction-model
+      [chartOptions]="options"
+      [dataOptions]="dataOptions"
+      [displayOptions]="displayOptions"
+      class="row"
+    >
+    </app-prediction-model>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+.navbar {
+  background-color: #474747;
+}
+
+.navbar-nav {
+  flex-direction: row;
+}
+
+.nav-item {
+  margin: 0 12px;
+}
+
+.user-button,
+.login-button,
+.logout-button {
+  color: white;
+
+  &:hover,
+  &:focus {
+    color: #cccccc;
+  }
+}
+
+.logout-button {
+  position: relative;
+
+  &::before {
+    content: '|';
+    position: absolute;
+    color: #949494;
+    left: -2.5px;
+  }
+}

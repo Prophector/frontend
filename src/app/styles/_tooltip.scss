@@ -1,0 +1,54 @@
+.tooltip-available {
+  position: relative;
+
+  &:not(button)::after {
+    content: '';
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 4px;
+    border-width: 0 0 1px;
+    border-style: dashed;
+  }
+}
+
+.tooltip {
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+  max-width: 500px;
+
+  &[data-popper-placement^='top'] > .tooltip-arrow {
+    bottom: -4px;
+  }
+
+  &[data-popper-placement^='bottom'] > .tooltip-arrow {
+    top: -4px;
+  }
+
+  &[data-popper-placement^='left'] > .tooltip-arrow {
+    right: -4px;
+  }
+
+  &[data-popper-placement^='right'] > .tooltip-arrow {
+    left: -4px;
+  }
+}
+
+.tooltip-arrow {
+  &,
+  &::before {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    z-index: -1;
+  }
+
+  &::before {
+    content: '';
+    transform: rotate(45deg);
+    background: #333;
+  }
+}

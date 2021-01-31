@@ -1,0 +1,65 @@
+.app-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & > * {
+    margin: 0 4px;
+  }
+
+  .region-color-input {
+    flex-shrink: 0;
+  }
+}
+
+.region-color-input {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  position: relative;
+
+  &,
+  &::-webkit-color-swatch,
+  &::-webkit-color-swatch-wrapper {
+    border-radius: 50%;
+    padding: 0;
+    border: none;
+  }
+}
+
+::ng-deep .accordion-body {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.line-type-options {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+
+  select {
+    font-weight: bold;
+  }
+
+  & > * {
+    margin: 0 4px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.clickable-icon {
+  cursor: pointer;
+}
+
+.line-type-line {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #ccc;
+}

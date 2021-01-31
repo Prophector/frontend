@@ -1,0 +1,12 @@
+<div class="accordion-item">
+  <h3 class="accordion-header">
+    <button class="accordion-button" [ngClass]="{ collapsed: !open }" (click)="toggle()">
+      <ng-content select=".app-accordion-header"></ng-content>
+    </button>
+  </h3>
+  <div class="accordion-collapse collapse" [ngClass]="{ show: open }">
+    <div class="accordion-body">
+      <ng-content select=".app-accordion-body"></ng-content>
+    </div>
+  </div>
+</div>

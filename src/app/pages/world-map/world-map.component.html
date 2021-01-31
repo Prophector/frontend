@@ -1,0 +1,26 @@
+<div class="row full-height">
+  <div class="col-md-3 pt-3 px-4 scroll-column">
+    <div class="row">
+      <div class="col">
+        <h3>Map Options</h3>
+        <app-map-options [mapOptions]="mapOptions" (update)="update()"></app-map-options>
+      </div>
+    </div>
+    <hr />
+    <ng-container *ngIf="countryData$ | async as countryData">
+      <ng-container *ngIf="selectedCountryCode">
+        <div class="row">
+          <div class="col">
+            <app-country-details
+              [countryData]="getCountryData(selectedCountryCode, countryData)"
+            ></app-country-details>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+    <p *ngIf="!selectedCountryCode" class="alert">Tip: Click on a country to learn more!</p>
+  </div>
+  <div class="col-md-9 ps-0" *ngIf="mapData$ | async as data">
+    <app-map [data]="data" (countryClick)="activateCountry($event)"></app-map>
+  </div>
+</div>

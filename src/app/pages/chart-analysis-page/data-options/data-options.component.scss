@@ -1,0 +1,14 @@
+.options-container {
+  background-color: #073642;
+  padding-bottom: 12px;
+
+  & > div {
+    margin: 12px 8px 0;
+  }
+}
+
+label {
+  margin-bottom: 0;
+  margin-right: 8px;
+  line-height: 31px;
+}

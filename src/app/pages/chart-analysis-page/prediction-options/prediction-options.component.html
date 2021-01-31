@@ -1,0 +1,45 @@
+<div class="mb-3">
+  <h3 class="mt-2">Predictions</h3>
+
+  <button class="btn btn-sm btn-primary" (click)="createNewModel()">
+    <fa-icon [icon]="faPlus"></fa-icon>
+    Create Prediction
+  </button>
+</div>
+
+<div *ngFor="let isoCode of isoCodes; let last = last">
+  <h5>Models for {{ COUNTRIES[isoCode] }}:</h5>
+  <p *ngIf="models[isoCode]?.length === 0">No models for {{ COUNTRIES[isoCode] }} available.</p>
+
+  <ng-container *ngIf="models[isoCode]?.length">
+    <div class="d-grid gap-2">
+      <button
+        type="button"
+        class="btn btn-model"
+        [ngClass]="{ active: activeModel === undefined }"
+        (click)="unselectModel()"
+      >
+        <fa-icon [icon]="activeModel === undefined ? faCheckCircle : faCircle"></fa-icon>
+        No prediction model selected.
+      </button>
+    </div>
+    <hr />
+    <div class="d-grid gap-2">
+      <button
+        *ngFor="let model of models[isoCode]"
+        type="button"
+        class="btn btn-model"
+        [ngClass]="{ active: activeModel === model }"
+        (click)="selectModel(model)"
+      >
+        <fa-icon [icon]="activeModel === model ? faCheckCircle : faCircle"></fa-icon>
+        <ng-container *ngIf="model.status === 'DRAFT'"> [{{ MODEL_STATUS[model.status] }}]</ng-container>
+        {{ TIMESERIES_TYPE_DISPLAY_NAME[model.type] }} {{ model.name }}
+        <ng-container *ngIf="model.owner">by {{ model.owner }}</ng-container>
+        <span *ngIf="model.lastScore" class="d-block">Score: {{ model.lastScore | number: '.2' }}</span>
+      </button>
+    </div>
+  </ng-container>
+
+  <hr *ngIf="!last" />
+</div>

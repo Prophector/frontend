@@ -1,0 +1,66 @@
+<div>
+  <label for="lineType">Type</label>
+  <select
+    id="lineType"
+    name="lineType"
+    class="form-select"
+    [(ngModel)]="mapOptions.type"
+    (ngModelChange)="triggerUpdate()"
+  >
+    <option value="CASES">Cases</option>
+    <option value="DEATHS">Fatalities</option>
+    <option value="TESTS">Tests</option>
+    <option value="TEST_POSITIVITY">Test Positivity</option>
+    <option value="VACCINATIONS">Vaccinations</option>
+  </select>
+</div>
+
+<div>
+  <label for="windowSize">Time frame</label>
+  <select
+    id="windowSize"
+    name="windowSize"
+    class="form-select"
+    [(ngModel)]="mapOptions.windowSize"
+    (ngModelChange)="triggerUpdate()"
+    appNumberOnly
+  >
+    <option [value]="0">Total</option>
+    <option [value]="1">last day</option>
+    <option [value]="7">last 7 days</option>
+    <option [value]="14">last 14 days</option>
+  </select>
+</div>
+
+<ng-container *ngIf="mapOptions.type !== 'TEST_POSITIVITY'">
+  <div>
+    <label for="aggregation">Aggregation</label>
+    <select
+      id="aggregation"
+      name="aggregation"
+      class="form-select"
+      [(ngModel)]="mapOptions.aggregation"
+      (ngModelChange)="triggerUpdate()"
+    >
+      <option [value]="'sum'">Sum</option>
+      <option [value]="'avg'">Average per day</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="populationNormalization">By population</label>
+    <select
+      id="populationNormalization"
+      name="populationNormalization"
+      class="form-select"
+      [(ngModel)]="mapOptions.populationNormalization"
+      (ngModelChange)="triggerUpdate()"
+      appNumberOnly
+    >
+      <option [value]="0">absolute</option>
+      <option [value]="1000000">by 1,000,000</option>
+      <option [value]="100000">by 100,000</option>
+      <option [value]="10000">by 10,000</option>
+    </select>
+  </div>
+</ng-container>

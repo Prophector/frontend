@@ -1,0 +1,8 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.container-fluid {
+  min-height: calc(100% - 56px);
+}

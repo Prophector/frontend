@@ -1,0 +1,87 @@
+<div class="accordion accordion-flush">
+  <app-accordion-item
+    *ngFor="let group of options.groups; let groupIndex = index"
+    [open]="groupIndex === addedGroupIndex || options.groups.length === 1"
+  >
+    <div class="app-accordion-header">
+      <label for="regionColor_{{ groupIndex }}" class="visually-hidden">Color</label>
+      <input
+        type="color"
+        id="regionColor_{{ groupIndex }}"
+        name="regionColor"
+        class="region-color-input"
+        [(ngModel)]="group.color"
+        (ngModelChange)="update()"
+        (click)="$event.stopPropagation()"
+      />
+
+      <label for="region_{{ groupIndex }}" class="visually-hidden">Region</label>
+      <select
+        id="region_{{ groupIndex }}"
+        name="region_{{ groupIndex }}"
+        [(ngModel)]="group.region"
+        (ngModelChange)="update()"
+        (click)="$event.stopPropagation()"
+        class="form-select form-select-lg"
+      >
+        <option [value]="''" disabled>Please select a region</option>
+        <option *ngFor="let country of COUNTRY_LIST" [value]="country.isoCode">{{ country.name }}</option>
+      </select>
+      <fa-icon
+        *ngIf="options.groups.length > 1"
+        [icon]="group.hide ? faEyeSlash : faEye"
+        (click)="toggleGroup(group); $event.stopPropagation()"
+        class="clickable-icon"
+      ></fa-icon>
+      <fa-icon
+        [icon]="faTrash"
+        (click)="removeGroup(group); $event.stopPropagation()"
+        class="clickable-icon"
+      ></fa-icon>
+    </div>
+    <div class="app-accordion-body">
+      <div *ngFor="let line of group.lines; let lineIndex = index">
+        <div class="line-type-options">
+          <svg class="line-type-line">
+            <line
+              x1="0"
+              x2="22"
+              y1="11"
+              y2="11"
+              [attr.stroke]="group.color"
+              [attr.stroke-dasharray]="TYPE_DASHES_CONFIG[line.type]"
+            ></line>
+          </svg>
+          <label for="lineType_{{ groupIndex }}_{{ lineIndex }}" class="visually-hidden">Type</label>
+          <select
+            id="lineType_{{ groupIndex }}_{{ lineIndex }}"
+            name="lineType_{{ groupIndex }}_{{ lineIndex }}"
+            class="form-select"
+            [(ngModel)]="line.type"
+            (ngModelChange)="update()"
+          >
+            <option value="CASES">Cases</option>
+            <option value="DEATHS">Fatalities</option>
+            <option value="TESTS">Tests</option>
+            <option value="TEST_POSITIVITY">Test Positivity</option>
+            <option value="VACCINATIONS">Vaccinations</option>
+          </select>
+
+          <fa-icon
+            *ngIf="options.groups.length > 1 || group.lines.length > 1"
+            [icon]="line.hide ? faEyeSlash : faEye"
+            (click)="toggleLine(line)"
+            class="clickable-icon"
+          ></fa-icon>
+          <fa-icon [icon]="faTrash" (click)="removeLine(line, group)" class="clickable-icon"></fa-icon>
+        </div>
+
+        <hr />
+      </div>
+
+      <button (click)="addLine(group)" class="btn btn-sm btn-outline-secondary">+ Add Line</button>
+    </div>
+  </app-accordion-item>
+</div>
+
+<button (click)="addGroup()" class="btn btn-sm btn-secondary mt-5 m-auto d-block">+ Add Country</button>

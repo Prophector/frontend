@@ -1,0 +1,52 @@
+<div class="container" *ngIf="currentUser">
+  <div class="col-md-12">
+    <div class="card card-container">
+      <img
+        [src]="
+          currentUser.hash
+            ? 'https://s.gravatar.com/avatar/' + currentUser.hash + '?s=80'
+            : '//ssl.gstatic.com/accounts/ui/avatar_2x.png'
+        "
+        class="profile-img-card"
+        alt="Avatar"
+      />
+      <div class="alert alert-heading text-center" *ngIf="currentUser">
+        You are logged in as {{ currentUser.displayName }}.<br />
+        {{ currentUser.email }}
+      </div>
+    </div>
+  </div>
+
+  <h3>User Created Models</h3>
+  <table *ngIf="userModels$ | async as userModels" class="table">
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Country</th>
+        <th>Type</th>
+        <th>Last prediction run</th>
+        <th>Last score</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="userModels.length === 0">
+        <td colspan="4">No models created yet.</td>
+      </tr>
+      <tr *ngFor="let model of userModels">
+        <td>{{ MODEL_STATUS[model.status] }}</td>
+        <td>
+          <a [routerLink]="['/chart-analysis']" [queryParams]="{ region: model.region, model: model.id }">
+            {{ COUNTRIES[model.region] }}
+          </a>
+        </td>
+        <td>{{ TIMESERIES_TYPE_DISPLAY_NAME[model.type] }}</td>
+        <td>{{ model.lastPrediction | date }}</td>
+        <td>{{ model.lastScore | number: '.5' }}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-secondary" (click)="deleteModel(model)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

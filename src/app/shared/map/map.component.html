@@ -1,0 +1,13 @@
+<div class="map" #map></div>
+
+<div class="map-overlay top" *ngIf="minValue > 0 || maxValue > 0">
+  <div class="map-overlay-inner">
+    <div id="map-legend" class="map-legend">
+      <div class="bar"></div>
+      <div class="d-flex justify-content-between">
+        <span class="min-value">{{ minValue | number }}</span>
+        <span class="max-value">{{ maxValue | number }}</span>
+      </div>
+    </div>
+  </div>
+</div>

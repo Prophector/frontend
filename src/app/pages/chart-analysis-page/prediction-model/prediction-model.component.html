@@ -1,0 +1,423 @@
+<div class="row" *ngIf="model">
+  <div class="col-md-3">
+    <h5>General</h5>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Last prediction date:</td>
+          <td class="text-end">{{ (model.lastPrediction | date: 'short') || 'not yet run' }}</td>
+        </tr>
+        <tr>
+          <td>
+            <label
+              [appTooltip]="
+                'The lower the better. This represents the Mean Absolute Percentage Error (MAPE) your model produced ' +
+                'for 5 simulated forecasts on historical data with a horizon of 14 days.'
+              "
+            >
+              Last score:</label
+            >
+          </td>
+          <td class="text-end">{{ (model.lastScore | number: '.5') || 'not computed' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row mb-3">
+      <div class="col-4">
+        <label
+          for="lineSelection"
+          class="col-form-label"
+          appTooltip="The values available here relate to the current data you have selected above."
+          >Data:</label
+        >
+      </div>
+      <div class="col">
+        <ng-container *ngIf="isOwner">
+          <select
+            id="lineSelection"
+            name="lineSelection"
+            class="form-select"
+            [(ngModel)]="dataSelected"
+            (ngModelChange)="updateData()"
+          >
+            <option *ngFor="let d of data" [value]="d.region + '-' + d.type">
+              {{ COUNTRIES[d.region] }} - {{ TIMESERIES_TYPE_DISPLAY_NAME[d.type] }}
+            </option>
+          </select>
+        </ng-container>
+        <ng-container *ngIf="!isOwner">
+          {{ COUNTRIES[model.region] }} - {{ TIMESERIES_TYPE_DISPLAY_NAME[model.type] }}
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description:</label>
+      <ng-container *ngIf="isOwner">
+        <textarea
+          cols="50"
+          rows="4"
+          class="form-control"
+          id="description"
+          maxlength="300"
+          [(ngModel)]="model.description"
+          [readOnly]="!isOwner"
+        ></textarea>
+      </ng-container>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <h5>Data Selection</h5>
+
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Aggregation Type:</td>
+          <td class="text-end">{{ model.displayType }}</td>
+        </tr>
+        <tr>
+          <td>Rolling Sum:</td>
+          <td class="text-end">
+            {{ model.rollingSumWindow }} {{ model.rollingSumWindow > 1 ? 'days' : 'day' }}
+          </td>
+        </tr>
+        <tr>
+          <td>Smoothing:</td>
+          <td class="text-end">{{ model.smoothing }} days</td>
+        </tr>
+        <tr>
+          <td>Training Data:</td>
+          <td class="text-end">{{ model.daysToLookBack }} days</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-3">
+    <h5>Hyper Parameters</h5>
+
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>
+            <label
+              for="changePointPriorScale"
+              [appTooltip]="
+                'This is probably the most impactful parameter. It determines the flexibility of the ' +
+                'trend, and in particular how much the trend changes at the trend changepoints. If it is too small, ' +
+                'the trend will be underfit and variance that should have been ' +
+                'modeled with trend changes will instead end up being handled with the noise term. If it is too ' +
+                'large, the trend will overfit and in the most extreme case you can end up with the trend capturing ' +
+                'yearly seasonality. The default of 0.05 works for many time series, but this could be tuned especially ' +
+                'for COVID-19 data which suffers from irregular data because governments issue new measures; a ' +
+                'range of [0.001, 0.5] would likely be about right. Parameters like this (regularization ' +
+                'penalties; this is effectively a lasso penalty) are often tuned on a log scale.'
+              "
+              >Change point prior scale:</label
+            >
+          </td>
+          <td class="text-end">
+            <ng-container *ngIf="isOwner">
+              <input
+                type="number"
+                max="1"
+                min="0.05"
+                step="0.05"
+                class="form-control form-control-sm"
+                id="changePointPriorScale"
+                name="changePointPriorScale"
+                [(ngModel)]="model.changePointPriorScale"
+              />
+            </ng-container>
+            <ng-container *ngIf="!isOwner">
+              {{ model.changePointPriorScale }}
+            </ng-container>
+          </td>
+        </tr>
+        <ng-container *ngIf="isOwner">
+          <tr>
+            <td colspan="2">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="changePointMode"
+                  id="changePointModeAuto"
+                  value="auto"
+                  [(ngModel)]="changePointMode"
+                />
+                <label class="form-check-label" for="changePointModeAuto">Auto Detect Change Points</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="changePointMode"
+                  id="changePointModeCustom"
+                  value="custom"
+                  [(ngModel)]="changePointMode"
+                />
+                <label class="form-check-label" for="changePointModeCustom">
+                  Define Custom Change Points
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="changePointMode === 'auto'">
+            <td>
+              <label
+                for="numChangePoints"
+                [appTooltip]="
+                  'This is the number of automatically placed changepoints. The default of 25 should be ' +
+                  'plenty to capture the trend changes in a typical time series. Rather than increasing or decreasing ' +
+                  'the number of changepoints, it will likely be more effective to focus on increasing or decreasing ' +
+                  'the flexibility at those trend changes, which is done with Change point prior scale.'
+                "
+                >Max change points:</label
+              >
+            </td>
+            <td>
+              <input
+                type="number"
+                max="20"
+                min="0"
+                step="1"
+                class="form-control form-control-sm"
+                id="numChangePoints"
+                name="numChangePoints"
+                [(ngModel)]="model.numChangePoints"
+              />
+            </td>
+          </tr>
+          <tr *ngIf="changePointMode === 'custom'">
+            <td>Custom change points:</td>
+            <td>
+              <div *ngFor="let changePoint of changePoints; let i = index" class="change-point">
+                <dp-date-picker
+                  [(ngModel)]="changePoint.date"
+                  theme="dp-material"
+                  mode="day"
+                  [minDate]="changePointMinDate"
+                  [maxDate]="changePointMaxDate"
+                  [config]="{ format: 'YYYY-MM-DD' }"
+                ></dp-date-picker>
+                <button class="btn btn-sm" (click)="changePoints.splice(i, 1)" title="Remove change point">
+                  X
+                </button>
+              </div>
+              <button class="btn btn-sm btn-add-change-point" (click)="changePoints.push({ date: '' })">
+                + Add Change Point
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-container *ngIf="!isOwner">
+          <tr *ngIf="model.changePoints.length > 0">
+            <td>Manual change points:</td>
+            <td class="text-end">{{ model.changePoints.join(', ') }}</td>
+          </tr>
+          <tr *ngIf="model.changePoints.length === 0">
+            <td>Number of allowed change points:</td>
+            <td class="text-end">{{ model.numChangePoints }}</td>
+          </tr>
+        </ng-container>
+        <tr>
+          <td>
+            <label
+              for="changePointRange"
+              [appTooltip]="
+                'This is the proportion of the history in which the trend is allowed to change. This ' +
+                'defaults to 0.9, 90% of the history, meaning the model will not fit any trend changes in the last ' +
+                '10% of the time series. You can reduce this to 80% which is fairly conservative, to avoid overfitting to trend changes at the ' +
+                'very end of the time series where there isn’t enough runway left to fit it well. With a human in ' +
+                'the loop, this is something that can be identified pretty easily visually: one can pretty clearly ' +
+                'see if the forecast is doing a bad job in the last 20%.'
+              "
+              >Change point range:</label
+            >
+          </td>
+          <td class="text-end">
+            <ng-container *ngIf="isOwner">
+              <input
+                type="number"
+                max="1"
+                min="0.2"
+                step="0.1"
+                class="form-control form-control-sm"
+                id="changePointRange"
+                name="changePointRange"
+                [(ngModel)]="model.changePointRange"
+              />
+            </ng-container>
+            <ng-container *ngIf="!isOwner">
+              {{ model.changePointRange }}
+            </ng-container>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label
+              for="seasonalityMode"
+              [appTooltip]="
+                'Changes how the seasonality effect is fitted against de-trended data. This is best identified ' +
+                'just from looking at the time series and seeing if the magnitude of seasonal fluctuations grows with the ' +
+                'magnitude of the time series, but when that isn’t possible, it could be tuned.'
+              "
+              >Seasonality mode:</label
+            >
+          </td>
+          <td class="text-end">
+            <ng-container *ngIf="isOwner">
+              <select
+                class="form-select form-select-sm"
+                id="seasonalityMode"
+                [(ngModel)]="model.seasonalityMode"
+              >
+                <option value="additive">additive</option>
+                <option value="multiplicative">multiplicative</option>
+              </select>
+            </ng-container>
+            <ng-container *ngIf="!isOwner">
+              {{ model.seasonalityMode }}
+            </ng-container>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label
+              for="seasonalityPriorScale"
+              [appTooltip]="
+                'This parameter controls the flexibility of the seasonality. Similarly, a large value ' +
+                'allows the seasonality to fit large fluctuations, a small value shrinks the magnitude of the ' +
+                'seasonality. The default is 10., which applies basically no regularization. That is because we ' +
+                'very rarely see overfitting here (there’s inherent regularization with the fact that it is ' +
+                'being modeled with a truncated Fourier series, so it’s essentially low-pass filtered). A ' +
+                'reasonable range for tuning it would probably be [0.01, 10]; when set to 0.01 you should ' +
+                'find that the magnitude of seasonality is forced to be very small. This likely also makes ' +
+                'sense on a log scale, since it is effectively an L2 penalty like in ridge regression.'
+              "
+              >Seasonality prior scale:</label
+            >
+          </td>
+          <td class="text-end">
+            <ng-container *ngIf="isOwner">
+              <input
+                type="number"
+                max="1000"
+                min="0.05"
+                step="1"
+                class="form-control form-control-sm"
+                id="seasonalityPriorScale"
+                name="seasonalityPriorScale"
+                [(ngModel)]="model.seasonalityPriorScale"
+              />
+            </ng-container>
+            <ng-container *ngIf="!isOwner">
+              {{ model.seasonalityPriorScale }}
+            </ng-container>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label
+              for="holidaysPriorScale"
+              [appTooltip]="
+                'This controls flexibility to fit holiday effects. Similar to Seasonality prior scale, ' +
+                'it defaults to 10.0 which applies basically no regularization, since we usually have multiple ' +
+                'observations of holidays and can do a good job of estimating their effects. This could also be ' +
+                'tuned on a range of [0.01, 10] as with Seasonality prior scale'
+              "
+              >Holidays prior scale:</label
+            >
+          </td>
+          <td class="text-end">
+            <ng-container *ngIf="isOwner">
+              <input
+                type="number"
+                max="1000"
+                min="0.05"
+                step="1"
+                class="form-control form-control-sm"
+                id="holidaysPriorScale"
+                name="holidaysPriorScale"
+                [(ngModel)]="model.holidaysPriorScale"
+              />
+            </ng-container>
+            <ng-container *ngIf="!isOwner">
+              {{ model.holidaysPriorScale }}
+            </ng-container>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label
+              for="addCountryHolidays"
+              [appTooltip]="
+                'By checking this, the holidays of the country will be added to the fitting process and ' +
+                'the forecast will apply the same effects to the same type of holiday in the future than the holiday had in the past.'
+              "
+              >Holidays Effects:</label
+            >
+          </td>
+          <td class="text-end">
+            <ng-container *ngIf="isOwner">
+              <input
+                type="checkbox"
+                [(ngModel)]="model.addCountryHolidays"
+                id="addCountryHolidays"
+                name="addCountryHolidays"
+                class="form-check-input"
+              />
+            </ng-container>
+            <ng-container *ngIf="!isOwner">
+              {{ model.addCountryHolidays ? 'Added' : 'Not considered' }}
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div *ngIf="isOwner" class="col-md-3" style="max-width: 300px">
+    <h5>Actions</h5>
+
+    <div class="d-grid gap-2">
+      <button class="btn btn-primary" (click)="updateModelAndPredict(false)" [disabled]="loading">
+        <ng-container *ngIf="updateInProgress === 'updating'">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Fitting model...
+        </ng-container>
+        <ng-container *ngIf="updateInProgress != 'updating'">Update And Predict</ng-container>
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="updateModelAndPredict(true)"
+        [disabled]="loading"
+        appTooltip="This can take 30s - 60s. We create 5 simulated historical forecasts with your model and compute the error term."
+      >
+        <ng-container *ngIf="updateInProgress === 'scoring'">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Cross validating...
+        </ng-container>
+        <ng-container *ngIf="updateInProgress !== 'scoring'">Update Score</ng-container>
+      </button>
+      <button
+        *ngIf="model.id && model.status === 'DRAFT'"
+        class="btn btn-primary"
+        (click)="publishModel()"
+        [disabled]="loading"
+      >
+        <ng-container *ngIf="publishInProgress">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Publishing...
+        </ng-container>
+        <ng-container *ngIf="!publishInProgress">Publish</ng-container>
+      </button>
+      <button *ngIf="model.id" class="btn btn-primary" (click)="deleteModel()" [disabled]="loading">
+        <ng-container *ngIf="deleteInProgress">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Deleting...
+        </ng-container>
+        <ng-container *ngIf="!deleteInProgress">Delete</ng-container>
+      </button>
+    </div>
+  </div>
+</div>
