@@ -11,25 +11,25 @@ export class TokenStorageService {
   constructor() {}
 
   public signOut(): void {
-    window.sessionStorage.clear();
+    window.localStorage.clear();
   }
 
   public saveToken(token: string): void {
-    window.sessionStorage.removeItem(TOKEN_KEY);
-    window.sessionStorage.setItem(TOKEN_KEY, token);
+    window.localStorage.removeItem(TOKEN_KEY);
+    window.localStorage.setItem(TOKEN_KEY, token);
   }
 
   public getToken(): string | null {
-    return window.sessionStorage.getItem(TOKEN_KEY);
+    return window.localStorage.getItem(TOKEN_KEY);
   }
 
   public saveUser(user: { email: string }): void {
-    window.sessionStorage.removeItem(USER_KEY);
-    window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+    window.localStorage.removeItem(USER_KEY);
+    window.localStorage.setItem(USER_KEY, JSON.stringify(user));
   }
 
   public getUser(): UserInfo | undefined {
-    const storageItem = window.sessionStorage.getItem(USER_KEY);
+    const storageItem = window.localStorage.getItem(USER_KEY);
     return storageItem ? JSON.parse(storageItem) : undefined;
   }
 }
